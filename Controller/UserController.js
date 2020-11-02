@@ -6,8 +6,18 @@ var md5 = require('md5');
 //Get all User
 exports.GetAll = (req, res) => {
   mysqlConnection.query("SELECT * FROM users", (err, rows, fields) => {
-    if (!err) res.send(rows);
-    else console.log(err);
+    if (!err) {
+      res.status(200).json({
+        success:true,
+        data: rows
+      })
+    }
+    else{
+      res.status(200).json({
+        success: false,
+        data: { message: "Something went to wrong!" + err },
+      });
+    }
   });
 };
 
@@ -17,8 +27,18 @@ exports.GetById = (req, res) => {
     "SELECT * FROM users WHERE id = ?",
     [req.params.id],
     (err, rows, fields) => {
-      if (!err) res.send(rows);
-      else console.log(err);
+      if (!err){
+         res.status(200).json({
+        success:true,
+        data: rows
+      })
+      }
+      else{
+        res.status(200).json({
+        success: false,
+        data: { message: "Something went to wrong!" + err },
+      });
+      }
     }
   );
 };
@@ -29,8 +49,18 @@ exports.DeleteById = (req, res) => {
     "DELETE FROM users WHERE id = ?",
     [req.params.id],
     (err, rows, fields) => {
-      if (!err) res.send(rows);
-      else console.log(err);
+      if (!err){
+         res.status(200).json({
+        success:true,
+        data: rows
+      })
+      }
+      else{
+        res.status(200).json({
+        success: false,
+        data: { message: "Something went to wrong!" + err },
+      });
+      }
     }
   );
 };
@@ -42,9 +72,19 @@ exports.CreateUser = (req, res) => {
   mysqlConnection.query(
     "INSERT INTO `users`(`name`, `email`, `password`) VALUES (?,?,?)",
     [tempData.name, tempData.email, tempData.password],
-    function (err, result) {
-      if (!err) res.send(result);
-      else console.log(err);
+    function (err, rows) {
+      if (!err) {
+        res.status(200).json({
+          success:true,
+          data: rows
+        })
+      }
+      else{
+        res.status(200).json({
+        success: false,
+        data: { message: "Something went to wrong!" + err },
+      });
+      }
     }
   );
 };
@@ -57,9 +97,19 @@ exports.UpdateUser = (req, res) => {
   mysqlConnection.query(
     "UPDATE `users` SET `name`=?,`email`=?,`password`=? where `id`=?",
     [tempData.name, tempData.email, tempData.password, req.params.id],
-    function (error, results, fields) {
-      if (!error) res.send(results);
-      else console.log(error);
+    function (err, rows, fields) {
+      if (!err) {
+        res.status(200).json({
+          success:true,
+          data: rows
+        })
+      }
+      else {
+        res.status(200).json({
+          success: false,
+          data: { message: "Something went to wrong!" + err },
+        });
+      }
     }
   );
 };
