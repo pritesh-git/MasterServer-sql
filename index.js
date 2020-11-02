@@ -23,6 +23,7 @@ app.get("/", function (req, res) {
 });
 
 require("./Routes/UserRoute")(app); //route for User actions
+require("./Routes/PayRolls")(app); //route for User actions
 
 app.get("/api/signup", (req, res) => {
   res.json({ data: "you hit signup page1" });
