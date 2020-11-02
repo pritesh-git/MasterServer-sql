@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const mysqlConnection = require("../Config/cnctDb");
+var md5 = require('md5');
+
 //Get all User
 exports.GetAll = (req, res) => {
   mysqlConnection.query("SELECT * FROM users", (err, rows, fields) => {
@@ -36,6 +38,7 @@ exports.DeleteById = (req, res) => {
 //Insert an User
 exports.CreateUser = (req, res) => {
   let tempData = req.body;
+  tempData.password = md5(tempData.password);
   mysqlConnection.query(
     "INSERT INTO `users`(`name`, `email`, `password`) VALUES (?,?,?)",
     [tempData.name, tempData.email, tempData.password],
@@ -48,9 +51,12 @@ exports.CreateUser = (req, res) => {
 
 //Update an User
 exports.UpdateUser = (req, res) => {
+  let tempData = req.body;
+  if(tempData.password) tempData.password = md5(tempData.password);
+
   mysqlConnection.query(
     "UPDATE `users` SET `name`=?,`email`=?,`password`=? where `id`=?",
-    [req.body.name, req.body.email, req.body.password, req.params.id],
+    [tempData.name, tempData.email, tempData.password, req.params.id],
     function (error, results, fields) {
       if (!error) res.send(results);
       else console.log(error);
