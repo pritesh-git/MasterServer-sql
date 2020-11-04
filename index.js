@@ -15,7 +15,7 @@ app.use(cors("Access-Control-Allow-Origin", "*"));
 
 //Sql connection
 require("./Config/cnctDb");
-
+// app.use(express.static('public'))
 //routes path
 app.get("/", function (req, res) {
   console.log("server active");
