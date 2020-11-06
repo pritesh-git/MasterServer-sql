@@ -15,7 +15,9 @@ app.use(cors("Access-Control-Allow-Origin", "*"));
 
 //Sql connection
 require("./Config/cnctDb");
-// app.use(express.static('public'))
+app.use("/public", express.static(__dirname + '/public'));
+// http://localhost:8000/public/Image123.png
+
 //routes path
 app.get("/", function (req, res) {
   console.log("server active");
@@ -23,11 +25,8 @@ app.get("/", function (req, res) {
 });
 
 require("./Routes/UserRoute")(app); //route for User actions
-require("./Routes/PayRolls")(app); //route for User actions
-
-app.get("/api/signup", (req, res) => {
-  res.json({ data: "you hit signup page1" });
-});
+require("./Routes/PayRolls")(app); //route for Payroll actions
+require("./Routes/ChatRoute")(app); //route for Chats actions
 
 const port = process.env.port || 8000;
 app.listen(port, () => {
