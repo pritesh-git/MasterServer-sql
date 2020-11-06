@@ -30,7 +30,7 @@ exports.CreateChat = (req, res) => {
   let tempData = req.body;
   mysqlConnection.query(
     "INSERT INTO `chat`(`toUserId`, `fromUserId`,`msg`) VALUES (?,?,?)",
-    [tempData.toUserId, tempData.fromUser, tempData.msg],
+    [tempData.toUser, tempData.fromUser, tempData.msg],
     function (err, rows, fields) {
       if (!err) {
         res.status(200).json({

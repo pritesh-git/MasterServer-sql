@@ -4,14 +4,9 @@ import { Nav } from "react-bootstrap";
 import CreateUser from "./CreateUser";
 import ListUser from "./ListUser";
 import Chat from "./Chat";
-import io from 'socket.io-client';
 
 function App() {
-  const ENDPOINT = 'http://localhost:3000/';
   const [activeTab, setActiveTab] = useState("1");
-  const socketId = io(ENDPOINT);
-  socketId.emit('USER_IDENTIFICATION', { data: '0' });
-  localStorage.debug = '*';
   return (
     <div>
       <Nav
@@ -31,7 +26,7 @@ function App() {
       ) : activeTab === "2" ? (
         <ListUser />
       ) : activeTab === "3" ? (
-        <Chat socket={socketId} />
+        <Chat />
       ) : (
         ""
       )}
