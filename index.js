@@ -4,12 +4,10 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
-const http = require('http');
-const socketio = require('socket.io');
+const http = require("http").Server(app);
+const io = require('socket.io')(http);
 
-
-const server = http.createServer(app);
-const io = socketio(server);
+const { addUser, removeUser, getUser, getUsersInRoom } = require("./users");
 // Bodyparser middleware
 app.use(bodyParser.json()).use(morgan("combined"));
 app.use(cors());
@@ -20,7 +18,7 @@ app.use(cors("Access-Control-Allow-Origin", "*"));
 
 //Sql connection
 require("./Config/cnctDb");
-app.use("/public", express.static(__dirname + '/public'));
+app.use("/public", express.static(__dirname + "/public"));
 // http://localhost:8000/public/Image123.png
 
 //routes path
@@ -33,33 +31,53 @@ require("./Routes/UserRoute")(app); //route for User actions
 require("./Routes/PayRolls")(app); //route for Payroll actions
 require("./Routes/ChatRoute")(app); //route for Chats actions
 
-io.on('connect', (socket) => {
-  socket.on('join', ({ name, room }, callback) => {
+io.sockets.on("connection", (socket) => {
+  // socket.on("join", ({ name, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, name, room });
 
-    if(error) return callback(error);
-  
+    // if (error) return callback(error);
+
+    console.log("socket==========>", socket, user);
+    socket.emit("message", {
+      user: "admin",
+      text: `${user.name}, welcome to room ${user.room}.`,
+    });
+    socket.broadcast
+      .to(user.room)
+      .emit("message", { user: "admin", text: `${user.name} has joined!` });
+
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
+
     socket.join(user.room);
-   
-    callback();
-  });
 
-  socket.on('sendMessage', (message, callback) => {
+    // callback();
+  // });
+
+  socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id);
-
-    io.to(user.room).emit('message', { user: user.name, text: message });
+    console.log("socket==========>", socket, user, message);
+    io.to(user.room).emit("message", { user: user.name, text: message });
 
     callback();
   });
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     const user = removeUser(socket.id);
 
-    if(user) {
-      io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
-      io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
+    if (user) {
+      io.to(user.room).emit("message", {
+        user: "Admin",
+        text: `${user.name} has left.`,
+      });
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
     }
-  })
+  });
 });
 
 const port = process.env.port || 8000;
