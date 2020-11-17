@@ -19,7 +19,7 @@ app.use(cors("Access-Control-Allow-Origin", "*"));
 //Sql connection
 require("./Config/cnctDb");
 app.use("/public", express.static(__dirname + "/public"));
-// http://localhost:8000/public/Image123.png
+// http://116.75.243.44:8000/public/Image123.png
 
 //routes path
 app.get("/", function (req, res) {

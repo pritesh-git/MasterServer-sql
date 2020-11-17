@@ -14,7 +14,7 @@ const Chat = (props) => {
   const [msg, setMsg] = useState("");
   const [chatList, setChatList] = useState([]);
 
-  const ENDPOINT = "localhost:8000";
+  const ENDPOINT = "116.75.243.44:8000";
   socket = io.connect(ENDPOINT);
 
   useEffect(() => {
