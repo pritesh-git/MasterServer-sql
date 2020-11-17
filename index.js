@@ -31,20 +31,18 @@ require("./Routes/UserRoute")(app); //route for User actions
 require("./Routes/PayRolls")(app); //route for Payroll actions
 require("./Routes/ChatRoute")(app); //route for Chats actions
 
-io.sockets.on("connection", (socket) => {
-  // socket.on("join", ({ name, room }, callback) => {
+io.on("connect", (socket) => {
+  console.log("socket==========>", socket);
+  socket.on("join", ({ name, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, name, room });
 
     // if (error) return callback(error);
 
     console.log("socket==========>", socket, user);
-    socket.emit("message", {
-      user: "admin",
-      text: `${user.name}, welcome to room ${user.room}.`,
-    });
+    socket.emit("message", `${user.name}, welcome to room ${user.room}.`);
     socket.broadcast
       .to(user.room)
-      .emit("message", { user: "admin", text: `${user.name} has joined!` });
+      .emit("message",`${user.name} has joined!` );
 
     io.to(user.room).emit("roomData", {
       room: user.room,
@@ -53,8 +51,8 @@ io.sockets.on("connection", (socket) => {
 
     socket.join(user.room);
 
-    // callback();
-  // });
+    callback();
+  });
 
   socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id);

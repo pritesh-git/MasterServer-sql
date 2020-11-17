@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import ScrollToBottom from 'react-scroll-to-bottom';
 import {Container,Row,Col,ListGroup,Image,InputGroup,FormControl,Button,} from "react-bootstrap";
 import { BASE_URL } from "./config";
 import Axios from "axios";
@@ -14,6 +15,7 @@ const Chat = (props) => {
   const [chatList, setChatList] = useState([]);
 
   const ENDPOINT = "localhost:8000";
+  socket = io.connect(ENDPOINT);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,23 +30,25 @@ const Chat = (props) => {
     };
     fetchData();
     setMyself(prompt("Enter Id"));
+    // console.log(name,room)
 
     // socket = io(ENDPOINT);
-    socket = io.connect(ENDPOINT);
+    socket.emit("join", { name: mySelf, room: "1" }, () => {
+    console.log(name,room)
 
-    socket.emit("join", { name: mySelf, room: "1" }, (error) => {
-      if (error) {
-        alert(error);
-      }
+      // if (error) {
+      //   alert(error);
+      // }
     });
-    //   return()=>{
-    //     socket.emit('disconnect');
-    //     socket.off();
-    // }
+      return()=>{
+        socket.emit('disconnect');
+        socket.off();
+    }
   }, [ENDPOINT]);
 
   useEffect(() => {
-    socket.on("message", (message) => {
+    socket.on("sendMessage", message => {
+      console.log("message=====>",message)
       setChatList((chatList) => [...chatList, message]);
     });
   }, [chatList]);
@@ -68,9 +72,9 @@ const Chat = (props) => {
       toUser: other.id,
       msg: msg,
     };
+    socket.emit("message", msg);
     Axios.post(`${BASE_URL}createChat`, chats)
       .then((res) => {
-        socket.emit("sendMessage", msg);
         setMsg("");
         getChatList();
       })
@@ -133,6 +137,7 @@ const Chat = (props) => {
                     }}
                   >
                     <ListGroup className="w-100">
+                    <ScrollToBottom className="messages">
                       {chatList.map((val) => (
                         <>
                           <ListGroup.Item
@@ -149,6 +154,7 @@ const Chat = (props) => {
                           </ListGroup.Item>
                         </>
                       ))}{" "}
+                      </ScrollToBottom>
                     </ListGroup>
                   </Col>
                 </Row>
